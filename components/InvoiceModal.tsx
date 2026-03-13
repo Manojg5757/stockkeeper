@@ -115,7 +115,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-800 p-6 rounded w-full max-w-4xl max-h-screen overflow-y-auto">
         <h2 className="text-xl font-bold text-amber-500 mb-4">Create Invoice</h2>
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-gray-400 mb-1">Customer Name</label>
             <input
@@ -135,7 +135,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
             />
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
             <label className="block text-gray-400 mb-1">Search by Name</label>
             <input

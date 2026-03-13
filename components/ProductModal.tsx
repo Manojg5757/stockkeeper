@@ -86,29 +86,33 @@ const ProductModal: React.FC<ProductModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 p-6 rounded w-96 max-h-screen overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 p-4 md:p-6 rounded-lg w-full max-w-md md:max-w-lg max-h-screen overflow-y-auto">
         <h2 className="text-xl font-bold text-amber-500 mb-4">
           {product ? 'Edit Product' : 'Add Product'}
         </h2>
         <div className="space-y-4">
-          <div>
-            <label className="block text-gray-400 mb-1">Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-400 mb-1">SKU</label>
-            <input
-              type="text"
-              value={sku}
-              onChange={(e) => setSku(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 text-white rounded font-mono"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-gray-400 mb-1">Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-gray-400 mb-1">SKU</label>
+              <input
+                type="text"
+                value={sku}
+                onChange={(e) => setSku(e.target.value)}
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded font-mono border border-gray-600 focus:border-amber-500 focus:outline-none"
+                required
+              />
+            </div>
           </div>
           <div>
             <label className="block text-gray-400 mb-1">Category</label>
@@ -133,7 +137,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               className="w-full px-3 py-2 bg-gray-700 text-white rounded"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-gray-400 mb-1">Quantity</label>
               <input
@@ -141,7 +145,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 min="0"
                 value={quantity}
                 onChange={(e) => setQuantity(Math.max(0, Number(e.target.value)))}
-                className="w-full px-3 py-2 bg-gray-700 text-white rounded"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
               />
             </div>
             <div>
@@ -149,7 +153,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               <select
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 text-white rounded"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
               >
                 {units.map((u) => (
                   <option key={u} value={u}>
@@ -158,8 +162,6 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 ))}
               </select>
             </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-gray-400 mb-1">
                 Unit Price (INR)
@@ -170,7 +172,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 step="0.01"
                 value={unitPrice}
                 onChange={(e) => setUnitPrice(Math.max(0, Number(e.target.value)))}
-                className="w-full px-3 py-2 bg-gray-700 text-white rounded"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
               />
             </div>
             <div>
@@ -180,7 +182,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 min="0"
                 value={reorderLevel}
                 onChange={(e) => setReorderLevel(Math.max(0, Number(e.target.value)))}
-                className="w-full px-3 py-2 bg-gray-700 text-white rounded"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
               />
             </div>
           </div>
@@ -229,23 +231,23 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 max="100"
                 value={gstPercentage}
                 onChange={(e) => setGstPercentage(Math.max(0, Number(e.target.value)))}
-                className="w-full px-3 py-2 bg-gray-700 text-white rounded"
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
               />
             </div>
           </div>
         </div>
-        <div className="flex justify-end space-x-2 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
-          >
-            Cancel
-          </button>
+        <div className="flex flex-col sm:flex-row gap-3 mt-6">
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-amber-500 text-black rounded hover:bg-amber-600"
+            className="flex-1 bg-amber-500 text-black py-3 px-4 rounded-lg hover:bg-amber-600 font-medium transition-colors"
           >
             Save
+          </button>
+          <button
+            onClick={onClose}
+            className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-500 font-medium transition-colors"
+          >
+            Cancel
           </button>
         </div>
       </div>

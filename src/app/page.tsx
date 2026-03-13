@@ -148,6 +148,7 @@ export default function Home() {
     message: string;
     type: 'success' | 'error' | 'info';
   } | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
 
   useEffect(() => {
@@ -369,8 +370,10 @@ export default function Home() {
         totalCategories={categories.length}
         totalProducts={products.length}
         onCreateInvoice={handleCreateInvoice}
+        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
-      <div className="flex flex-col md:flex-row min-h-screen">
+      <div className="flex flex-row min-h-screen">
+        {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" onClick={() => setSidebarOpen(false)}></div>}
         <CategorySidebar
           categories={categories}
           products={products}
@@ -381,6 +384,8 @@ export default function Home() {
           onAddCategory={handleAddCategory}
           onEditCategory={handleEditCategory}
           onDeleteCategory={handleDeleteCategory}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
         />
         <div className="flex-1">
           <DetailPanel
