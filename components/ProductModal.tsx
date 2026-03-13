@@ -7,6 +7,7 @@ interface ProductModalProps {
   onSave: (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => void;
   product: Product | null;
   categories: Category[];
+  onError?: (message: string) => void;
 }
 
 const units = ['pcs', 'kg', 'box', 'pack', 'bag', 'm'];
@@ -17,9 +18,11 @@ const ProductModal: React.FC<ProductModalProps> = ({
   onSave,
   product,
   categories,
+  onError,
 }) => {
   const [name, setName] = useState('');
   const [sku, setSku] = useState('');
+  const [autoSku, setAutoSku] = useState(true);
   const [categoryId, setCategoryId] = useState('');
   const [description, setDescription] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -31,6 +34,20 @@ const ProductModal: React.FC<ProductModalProps> = ({
   const [material, setMaterial] = useState('');
   const [grade, setGrade] = useState('');
   const [gstPercentage, setGstPercentage] = useState('18');
+
+  const generateSkuFromName = (value: string) => {
+    const clean = value
+      .trim()
+      .toUpperCase()
+      .replace(/[^A-Z0-9 ]/g, '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 3)
+      .map((word) => word.slice(0, 3))
+      .join('');
+    const random = Math.floor(1000 + Math.random() * 9000);
+    return `${clean || 'PRD'}-${random}`;
+  };
 
   useEffect(() => {
     if (product) {
@@ -64,6 +81,13 @@ const ProductModal: React.FC<ProductModalProps> = ({
     }
   }, [product, isOpen]);
 
+  // Auto-generate SKU when name changes (only for new products)
+  useEffect(() => {
+    if (!product && name.trim() && autoSku) {
+      setSku(generateSkuFromName(name));
+    }
+  }, [name, product, autoSku]);
+
   const handleSave = () => {
     const parsedQuantity = Number(quantity);
     const parsedUnitPrice = Number(unitPrice);
@@ -71,32 +95,32 @@ const ProductModal: React.FC<ProductModalProps> = ({
     const parsedGst = Number(gstPercentage);
 
     if (!name.trim()) {
-      alert('Product name is required.');
+      onError?.('Product name is required.');
       return;
     }
 
     if (!sku.trim()) {
-      alert('SKU is required.');
+      onError?.('SKU is required.');
       return;
     }
 
     if (!categoryId) {
-      alert('Please select a category.');
+      onError?.('Please select a category.');
       return;
     }
 
     if (!quantity || isNaN(parsedQuantity) || parsedQuantity < 0) {
-      alert('Please enter a valid stock quantity.');
+      onError?.('Please enter a valid stock quantity.');
       return;
     }
 
     if (!unitPrice || isNaN(parsedUnitPrice) || parsedUnitPrice < 0) {
-      alert('Please enter a valid unit price.');
+      onError?.('Please enter a valid unit price.');
       return;
     }
 
     if (!reorderLevel || isNaN(parsedReorder) || parsedReorder < 0) {
-      alert('Please enter a valid reorder level.');
+      onError?.('Please enter a valid reorder level.');
       return;
     }
 
@@ -140,13 +164,29 @@ const ProductModal: React.FC<ProductModalProps> = ({
             </div>
             <div>
               <label className="block text-gray-400 mb-1">SKU</label>
-              <input
-                type="text"
-                value={sku}
-                onChange={(e) => setSku(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-700 text-white rounded font-mono border border-gray-600 focus:border-amber-500 focus:outline-none"
-                required
-              />
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={sku}
+                  onChange={(e) => {
+                    setSku(e.target.value);
+                    setAutoSku(false);
+                  }}
+                  className="flex-1 px-3 py-2 bg-gray-700 text-white rounded font-mono border border-gray-600 focus:border-amber-500 focus:outline-none"
+                  required
+                />
+                {!product && (
+                  <label className="flex items-center space-x-1 text-sm text-gray-400">
+                    <input
+                      type="checkbox"
+                      checked={autoSku}
+                      onChange={(e) => setAutoSku(e.target.checked)}
+                      className="rounded"
+                    />
+                    <span>Auto</span>
+                  </label>
+                )}
+              </div>
             </div>
           </div>
           <div>

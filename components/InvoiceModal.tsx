@@ -12,6 +12,8 @@ interface InvoiceModalProps {
   onClose: () => void;
   products: Product[];
   categories: Category[];
+  onSave?: (items: InvoiceItem[]) => Promise<void>;
+  onError?: (message: string) => void;
 }
 
 const InvoiceModal: React.FC<InvoiceModalProps> = ({
@@ -19,6 +21,7 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
   onClose,
   products,
   categories,
+  onSave,
 }) => {
   const [selectedItems, setSelectedItems] = useState<InvoiceItem[]>([]);
   const [customerName, setCustomerName] = useState('');
@@ -73,7 +76,12 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
     return { subtotal, totalGST, grandTotal };
   };
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
+    if (!customerName.trim()) {
+      // Instead of alert, we'll handle this in the parent component
+      return;
+    }
+
     const { subtotal, totalGST, grandTotal } = calculateTotals();
     const doc = new jsPDF();
 
@@ -114,6 +122,17 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
     doc.text(`Grand Total: INR ${grandTotal.toFixed(2)}`, 120, y);
 
     doc.save('invoice.pdf');
+
+    // Update stock quantities after generating PDF
+    if (onSave) {
+      await onSave(selectedItems);
+    }
+
+    // Reset form
+    setSelectedItems([]);
+    setCustomerName('');
+    setCustomerAddress('');
+    onClose();
   };
 
   if (!isOpen) return null;

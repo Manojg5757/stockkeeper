@@ -19,6 +19,7 @@ import DetailPanel from '../../components/DetailPanel';
 import CategoryModal from '../../components/CategoryModal';
 import ProductModal from '../../components/ProductModal';
 import InvoiceModal from '../../components/InvoiceModal';
+import ConfirmModal from '../../components/ConfirmModal';
 import Toast from '../../components/Toast';
 
 const defaultCategories: Omit<Category, 'id'>[] = [
@@ -320,6 +321,26 @@ export default function Home() {
     }
   };
 
+  const handleSaveInvoice = async (items: { product: Product; quantity: number }[]) => {
+    try {
+      // Update stock quantities
+      for (const item of items) {
+        const newQuantity = item.product.quantity - item.quantity;
+        if (newQuantity < 0) {
+          throw new Error(`Insufficient stock for ${item.product.name}`);
+        }
+        await updateDoc(doc(db, 'products', item.product.id), {
+          quantity: newQuantity,
+          updatedAt: new Date(),
+        });
+      }
+      setToast({ message: 'Invoice generated and stock updated', type: 'success' });
+    } catch (error) {
+      setToast({ message: error instanceof Error ? error.message : 'Error updating stock', type: 'error' });
+      throw error; // Re-throw to prevent modal from closing
+    }
+  };
+
   const handleExportCSV = () => {
     const csv = [
       [
@@ -452,6 +473,7 @@ export default function Home() {
         onSave={handleSaveProduct}
         product={editingProduct}
         categories={categories}
+        onError={(message) => setToast({ message, type: 'error' })}
       />
       {toast && (
         <Toast
@@ -465,6 +487,7 @@ export default function Home() {
         onClose={() => setInvoiceModalOpen(false)}
         products={products}
         categories={categories}
+        onSave={handleSaveInvoice}
       />
     </div>
   );
