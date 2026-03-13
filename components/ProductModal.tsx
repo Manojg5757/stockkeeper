@@ -22,15 +22,15 @@ const ProductModal: React.FC<ProductModalProps> = ({
   const [sku, setSku] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [description, setDescription] = useState('');
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('pcs');
-  const [unitPrice, setUnitPrice] = useState(0);
-  const [reorderLevel, setReorderLevel] = useState(0);
+  const [unitPrice, setUnitPrice] = useState('');
+  const [reorderLevel, setReorderLevel] = useState('');
   const [supplier, setSupplier] = useState('');
   const [location, setLocation] = useState('');
   const [material, setMaterial] = useState('');
   const [grade, setGrade] = useState('');
-  const [gstPercentage, setGstPercentage] = useState(18);
+  const [gstPercentage, setGstPercentage] = useState('18');
 
   useEffect(() => {
     if (product) {
@@ -38,47 +38,82 @@ const ProductModal: React.FC<ProductModalProps> = ({
       setSku(product.sku);
       setCategoryId(product.categoryId || '');
       setDescription(product.description);
-      setQuantity(product.quantity);
+      setQuantity(String(product.quantity));
       setUnit(product.unit);
-      setUnitPrice(product.unitPrice);
-      setReorderLevel(product.reorderLevel);
+      setUnitPrice(String(product.unitPrice));
+      setReorderLevel(String(product.reorderLevel));
       setSupplier(product.supplier);
       setLocation(product.location);
       setMaterial(product.material);
       setGrade(product.grade);
-      setGstPercentage(product.gstPercentage);
+      setGstPercentage(String(product.gstPercentage));
     } else {
       setName('');
       setSku('');
       setCategoryId('');
       setDescription('');
-      setQuantity(0);
+      setQuantity('');
       setUnit('pcs');
-      setUnitPrice(0);
-      setReorderLevel(0);
+      setUnitPrice('');
+      setReorderLevel('');
       setSupplier('');
       setLocation('');
       setMaterial('');
       setGrade('');
-      setGstPercentage(18);
+      setGstPercentage('18');
     }
   }, [product, isOpen]);
 
   const handleSave = () => {
+    const parsedQuantity = Number(quantity);
+    const parsedUnitPrice = Number(unitPrice);
+    const parsedReorder = Number(reorderLevel);
+    const parsedGst = Number(gstPercentage);
+
+    if (!name.trim()) {
+      alert('Product name is required.');
+      return;
+    }
+
+    if (!sku.trim()) {
+      alert('SKU is required.');
+      return;
+    }
+
+    if (!categoryId) {
+      alert('Please select a category.');
+      return;
+    }
+
+    if (!quantity || isNaN(parsedQuantity) || parsedQuantity < 0) {
+      alert('Please enter a valid stock quantity.');
+      return;
+    }
+
+    if (!unitPrice || isNaN(parsedUnitPrice) || parsedUnitPrice < 0) {
+      alert('Please enter a valid unit price.');
+      return;
+    }
+
+    if (!reorderLevel || isNaN(parsedReorder) || parsedReorder < 0) {
+      alert('Please enter a valid reorder level.');
+      return;
+    }
+
     onSave({
       name,
       sku,
       categoryId: categoryId || null,
       description,
-      quantity,
+      quantity: parsedQuantity,
       unit,
-      unitPrice,
-      reorderLevel,
+      unitPrice: parsedUnitPrice,
+      reorderLevel: parsedReorder,
       supplier,
       location,
       material,
       grade,
-      gstPercentage,
+      gstPercentage: isNaN(parsedGst) ? 0 : parsedGst,
     });
     onClose();
   };
@@ -121,7 +156,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
               onChange={(e) => setCategoryId(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 text-white rounded"
             >
-              <option value="">No Category</option>
+              <option value="">Select category</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -139,13 +174,14 @@ const ProductModal: React.FC<ProductModalProps> = ({
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-gray-400 mb-1">Quantity</label>
+              <label className="block text-gray-400 mb-1">Stock</label>
               <input
                 type="number"
                 min="0"
                 value={quantity}
-                onChange={(e) => setQuantity(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setQuantity(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
+                placeholder="e.g. 100"
               />
             </div>
             <div>
@@ -171,8 +207,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 min="0"
                 step="0.01"
                 value={unitPrice}
-                onChange={(e) => setUnitPrice(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setUnitPrice(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
+                placeholder="e.g. 19.99"
               />
             </div>
             <div>
@@ -181,8 +218,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 type="number"
                 min="0"
                 value={reorderLevel}
-                onChange={(e) => setReorderLevel(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setReorderLevel(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
+                placeholder="e.g. 20"
               />
             </div>
           </div>
@@ -230,8 +268,9 @@ const ProductModal: React.FC<ProductModalProps> = ({
                 min="0"
                 max="100"
                 value={gstPercentage}
-                onChange={(e) => setGstPercentage(Math.max(0, Number(e.target.value)))}
+                onChange={(e) => setGstPercentage(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
+                placeholder="e.g. 18"
               />
             </div>
           </div>

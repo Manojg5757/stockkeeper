@@ -5,8 +5,9 @@ interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   onExport: (filters: {
-    type: 'all' | 'low' | 'out' | 'category';
+    type: 'all' | 'low' | 'out' | 'category' | 'separate';
     categoryId?: string;
+    format: 'csv' | 'pdf';
   }) => void;
   categories: Category[];
 }
@@ -17,13 +18,17 @@ const ExportModal: React.FC<ExportModalProps> = ({
   onExport,
   categories,
 }) => {
-  const [exportType, setExportType] = useState<'all' | 'low' | 'out' | 'category'>('all');
+  const [exportType, setExportType] = useState<
+    'all' | 'low' | 'out' | 'category' | 'separate'
+  >('all');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [exportFormat, setExportFormat] = useState<'csv' | 'pdf'>('csv');
 
   const handleExport = () => {
     onExport({
       type: exportType,
       categoryId: exportType === 'category' ? selectedCategory : undefined,
+      format: exportType === 'separate' ? 'pdf' : exportFormat,
     });
     onClose();
   };
@@ -33,7 +38,7 @@ const ExportModal: React.FC<ExportModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-800 p-6 rounded w-96">
-        <h2 className="text-xl font-bold text-amber-500 mb-4">Export CSV</h2>
+        <h2 className="text-xl font-bold text-amber-500 mb-4">Export Data</h2>
         <div className="space-y-4">
           <div>
             <label className="block text-gray-400 mb-1">Export Type</label>
@@ -43,11 +48,35 @@ const ExportModal: React.FC<ExportModalProps> = ({
               className="w-full px-3 py-2 bg-gray-700 text-white rounded"
             >
               <option value="all">All Products</option>
+              <option value="separate">
+                Separate Reports (Low Stock, Out of Stock, All)
+              </option>
               <option value="low">Low Stock Products</option>
               <option value="out">Out of Stock Products</option>
               <option value="category">Specific Category</option>
             </select>
           </div>
+          {exportType !== 'separate' && (
+            <div>
+              <label className="block text-gray-400 mb-1">Export Format</label>
+              <select
+                value={exportFormat}
+                onChange={(e) =>
+                  setExportFormat(e.target.value as 'csv' | 'pdf')
+                }
+                className="w-full px-3 py-2 bg-gray-700 text-white rounded"
+              >
+                <option value="csv">CSV</option>
+                <option value="pdf">PDF</option>
+              </select>
+            </div>
+          )}
+          {exportType === 'separate' && (
+            <div className="text-sm text-gray-400">
+              This will generate 3 separate PDF reports: Low Stock, Out of
+              Stock, and All Products.
+            </div>
+          )}
           {exportType === 'category' && (
             <div>
               <label className="block text-gray-400 mb-1">Category</label>

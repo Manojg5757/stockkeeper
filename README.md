@@ -24,6 +24,7 @@ A full-stack hardware stock inventory management web app built with Next.js 14+,
 1. **Clone or Download** the project.
 
 2. **Install Dependencies**:
+
    ```bash
    npm install
    ```
@@ -39,19 +40,21 @@ A full-stack hardware stock inventory management web app built with Next.js 14+,
    - Replace the placeholder `firebaseConfig` with your actual config:
      ```typescript
      const firebaseConfig = {
-       apiKey: "your-actual-api-key",
-       authDomain: "your-project.firebaseapp.com",
-       projectId: "your-actual-project-id",
-       storageBucket: "your-project.appspot.com",
-       messagingSenderId: "your-actual-sender-id",
-       appId: "your-actual-app-id"
+       apiKey: 'your-actual-api-key',
+       authDomain: 'your-project.firebaseapp.com',
+       projectId: 'your-actual-project-id',
+       storageBucket: 'your-project.appspot.com',
+       messagingSenderId: 'your-actual-sender-id',
+       appId: 'your-actual-app-id',
      };
      ```
 
 5. **Run the App**:
+
    ```bash
    npm run dev
    ```
+
    - Open [http://localhost:3000](http://localhost:3000).
    - The app will seed with default categories and products on first run if Firestore is empty.
 

@@ -29,7 +29,8 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
-      const categoryName = categories.find((c) => c.id === product.categoryId)?.name || '';
+      const categoryName =
+        categories.find((c) => c.id === product.categoryId)?.name || '';
       return (
         product.name.toLowerCase().includes(searchName.toLowerCase()) &&
         categoryName.toLowerCase().includes(searchCategory.toLowerCase()) &&
@@ -47,13 +48,17 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
   const updateQuantity = (productId: string, quantity: number) => {
     setSelectedItems(
       selectedItems.map((item) =>
-        item.product.id === productId ? { ...item, quantity: Math.max(1, quantity) } : item
+        item.product.id === productId
+          ? { ...item, quantity: Math.max(1, quantity) }
+          : item
       )
     );
   };
 
   const removeItem = (productId: string) => {
-    setSelectedItems(selectedItems.filter((item) => item.product.id !== productId));
+    setSelectedItems(
+      selectedItems.filter((item) => item.product.id !== productId)
+    );
   };
 
   const calculateTotals = () => {
@@ -93,7 +98,11 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
       doc.text(item.quantity.toString(), 80, y);
       doc.text(`INR ${item.product.unitPrice.toFixed(2)}`, 100, y);
       doc.text(`${item.product.gstPercentage}%`, 130, y);
-      doc.text(`INR ${(item.product.unitPrice * item.quantity).toFixed(2)}`, 150, y);
+      doc.text(
+        `INR ${(item.product.unitPrice * item.quantity).toFixed(2)}`,
+        150,
+        y
+      );
       y += 10;
     });
 
@@ -114,7 +123,9 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-gray-800 p-6 rounded w-full max-w-4xl max-h-screen overflow-y-auto">
-        <h2 className="text-xl font-bold text-amber-500 mb-4">Create Invoice</h2>
+        <h2 className="text-xl font-bold text-amber-500 mb-4">
+          Create Invoice
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-gray-400 mb-1">Customer Name</label>
@@ -147,7 +158,9 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-gray-400 mb-1">Search by Category</label>
+            <label className="block text-gray-400 mb-1">
+              Search by Category
+            </label>
             <input
               type="text"
               value={searchCategory}
@@ -157,7 +170,9 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
             />
           </div>
           <div>
-            <label className="block text-gray-400 mb-1">Search by Supplier</label>
+            <label className="block text-gray-400 mb-1">
+              Search by Supplier
+            </label>
             <input
               type="text"
               value={searchSupplier}
@@ -169,13 +184,21 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-amber-500 mb-2">Available Products</h3>
+            <h3 className="text-lg font-semibold text-amber-500 mb-2">
+              Available Products
+            </h3>
             <div className="max-h-64 overflow-y-auto">
               {filteredProducts.map((product) => (
-                <div key={product.id} className="flex justify-between items-center mb-2 p-2 bg-gray-700 rounded">
+                <div
+                  key={product.id}
+                  className="flex justify-between items-center mb-2 p-2 bg-gray-700 rounded"
+                >
                   <div>
                     <span className="block font-semibold">{product.name}</span>
-                    <span className="text-sm text-gray-400">SKU: {product.sku} | GST: {product.gstPercentage}% | INR {product.unitPrice}</span>
+                    <span className="text-sm text-gray-400">
+                      SKU: {product.sku} | GST: {product.gstPercentage}% | INR{' '}
+                      {product.unitPrice}
+                    </span>
                   </div>
                   <button
                     onClick={() => addProduct(product)}
@@ -188,19 +211,28 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
             </div>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-amber-500 mb-2">Selected Items</h3>
+            <h3 className="text-lg font-semibold text-amber-500 mb-2">
+              Selected Items
+            </h3>
             <div className="max-h-64 overflow-y-auto">
               {selectedItems.map((item) => (
-                <div key={item.product.id} className="flex justify-between items-center mb-2">
+                <div
+                  key={item.product.id}
+                  className="flex justify-between items-center mb-2"
+                >
                   <span>{item.product.name}</span>
                   <input
                     type="number"
                     min="1"
                     value={item.quantity}
-                    onChange={(e) => updateQuantity(item.product.id, Number(e.target.value))}
+                    onChange={(e) =>
+                      updateQuantity(item.product.id, Number(e.target.value))
+                    }
                     className="w-16 px-2 py-1 bg-gray-700 text-white rounded"
                   />
-                  <span>INR {(item.product.unitPrice * item.quantity).toFixed(2)}</span>
+                  <span>
+                    INR {(item.product.unitPrice * item.quantity).toFixed(2)}
+                  </span>
                   <button
                     onClick={() => removeItem(item.product.id)}
                     className="text-red-400 hover:text-red-300"
@@ -213,7 +245,9 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
             <div className="mt-4">
               <p>Subtotal: INR {subtotal.toFixed(2)}</p>
               <p>GST: INR {totalGST.toFixed(2)}</p>
-              <p className="font-bold">Grand Total: INR {grandTotal.toFixed(2)}</p>
+              <p className="font-bold">
+                Grand Total: INR {grandTotal.toFixed(2)}
+              </p>
             </div>
           </div>
         </div>
