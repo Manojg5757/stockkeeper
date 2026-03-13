@@ -14,7 +14,6 @@ import {
 import { db } from '../../lib/firebase';
 import { Category, Product } from '../../lib/types';
 import StatsHeader from '../../components/StatsHeader';
-import CategorySidebar from '../../components/CategorySidebar';
 import ProductTable from '../../components/ProductTable';
 import DetailPanel from '../../components/DetailPanel';
 import CategoryModal from '../../components/CategoryModal';
@@ -148,7 +147,6 @@ export default function Home() {
     message: string;
     type: 'success' | 'error' | 'info';
   } | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
 
   useEffect(() => {
@@ -370,43 +368,60 @@ export default function Home() {
         totalCategories={categories.length}
         totalProducts={products.length}
         onCreateInvoice={handleCreateInvoice}
-        onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
-      <div className="flex flex-row min-h-screen">
-        {sidebarOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden" onClick={() => setSidebarOpen(false)}></div>}
-        <CategorySidebar
-          categories={categories}
-          products={products}
-          productCounts={productCounts}
-          selectedCategoryId={selectedCategoryId}
-          onSelectCategory={setSelectedCategoryId}
-          lowStockProducts={lowStockProducts}
-          onAddCategory={handleAddCategory}
-          onEditCategory={handleEditCategory}
-          onDeleteCategory={handleDeleteCategory}
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
+      <div className="p-4 md:p-6 space-y-6">
+        <DetailPanel
+          product={selectedProduct}
+          onEditProduct={handleEditProduct}
+          onDeleteProduct={handleDeleteProduct}
         />
-        <div className="flex-1">
-          <DetailPanel
-            product={selectedProduct}
-            onEditProduct={handleEditProduct}
-            onDeleteProduct={handleDeleteProduct}
-          />
-          <ProductTable
-            products={filteredProducts}
-            categories={categories}
-            onSelectProduct={setSelectedProduct}
-            selectedProductId={selectedProduct?.id || null}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            filter={filter}
-            onFilterChange={setFilter}
-            onAddProduct={handleAddProduct}
-            onEditProduct={handleEditProduct}
-            onDeleteProduct={handleDeleteProduct}
-          />
+        
+        {/* Category Selection */}
+        <div className="bg-gray-800 rounded-xl p-4 shadow-lg">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center space-x-4">
+              <label htmlFor="category-select" className="text-sm font-medium text-gray-300">
+                Filter by Category:
+              </label>
+              <select
+                id="category-select"
+                value={selectedCategoryId || ''}
+                onChange={(e) => setSelectedCategoryId(e.target.value || null)}
+                className="bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              >
+                <option value="">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name} ({productCounts[category.id] || 0} products)
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+              onClick={handleAddCategory}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              <span>Add Category</span>
+            </button>
+          </div>
         </div>
+
+        <ProductTable
+          products={filteredProducts}
+          categories={categories}
+          onSelectProduct={setSelectedProduct}
+          selectedProductId={selectedProduct?.id || null}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          filter={filter}
+          onFilterChange={setFilter}
+          onAddProduct={handleAddProduct}
+          onEditProduct={handleEditProduct}
+          onDeleteProduct={handleDeleteProduct}
+        />
       </div>
       <CategoryModal
         isOpen={categoryModalOpen}
