@@ -670,7 +670,6 @@ export default function Home() {
           setDeleteConfirmOpen(false);
           setCategoryToDelete(null);
         }}
-        isDangerous
       />
     </div>
   );
