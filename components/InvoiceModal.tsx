@@ -29,6 +29,10 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
   const [searchName, setSearchName] = useState('');
   const [searchCategory, setSearchCategory] = useState('');
   const [searchSupplier, setSearchSupplier] = useState('');
+  const [selectedProductIdToAdd, setSelectedProductIdToAdd] = useState('');
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
+  const [showCategorySuggestions, setShowCategorySuggestions] = useState(false);
+  const [showSupplierSuggestions, setShowSupplierSuggestions] = useState(false);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -41,6 +45,36 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
       );
     });
   }, [products, categories, searchName, searchCategory, searchSupplier]);
+
+  const nameSuggestions = useMemo(() => {
+    if (!searchName.trim()) return [];
+    const uniqueNames = [...new Set(products.map((p) => p.name))];
+    return uniqueNames.filter((name) =>
+      name.toLowerCase().includes(searchName.toLowerCase())
+    );
+  }, [products, searchName]);
+
+  const categorySuggestions = useMemo(() => {
+    if (!searchCategory.trim()) return [];
+    const uniqueCategories = [
+      ...new Set(
+        products
+          .map((p) => categories.find((c) => c.id === p.categoryId)?.name)
+          .filter(Boolean)
+      ),
+    ];
+    return uniqueCategories.filter((cat) =>
+      cat?.toLowerCase().includes(searchCategory.toLowerCase())
+    ) as string[];
+  }, [products, categories, searchCategory]);
+
+  const supplierSuggestions = useMemo(() => {
+    if (!searchSupplier.trim()) return [];
+    const uniqueSuppliers = [...new Set(products.map((p) => p.supplier))];
+    return uniqueSuppliers.filter((supplier) =>
+      supplier.toLowerCase().includes(searchSupplier.toLowerCase())
+    );
+  }, [products, searchSupplier]);
 
   const addProduct = (product: Product) => {
     if (!selectedItems.find((item) => item.product.id === product.id)) {
@@ -166,107 +200,184 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div>
+          <div className="relative">
             <label className="block text-gray-400 mb-1">Search by Name</label>
             <input
               type="text"
               value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
+              onChange={(e) => {
+                setSearchName(e.target.value);
+                setShowNameSuggestions(true);
+              }}
+              onFocus={() => setShowNameSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowNameSuggestions(false), 200)}
               className="w-full px-3 py-2 bg-gray-700 text-white rounded"
               placeholder="Product name"
             />
+            {showNameSuggestions && nameSuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-gray-700 border border-gray-600 rounded max-h-40 overflow-y-auto z-10">
+                {nameSuggestions.map((name) => (
+                  <button
+                    key={name}
+                    onClick={() => {
+                      setSearchName(name);
+                      setShowNameSuggestions(false);
+                      const matchedProduct = filteredProducts.find((p) => p.name === name);
+                      if (matchedProduct) setSelectedProductIdToAdd(matchedProduct.id);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-gray-600 text-gray-200"
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div>
-            <label className="block text-gray-400 mb-1">
-              Search by Category
-            </label>
+          <div className="relative">
+            <label className="block text-gray-400 mb-1">Search by Category</label>
             <input
               type="text"
               value={searchCategory}
-              onChange={(e) => setSearchCategory(e.target.value)}
+              onChange={(e) => {
+                setSearchCategory(e.target.value);
+                setShowCategorySuggestions(true);
+              }}
+              onFocus={() => setShowCategorySuggestions(true)}
+              onBlur={() => setTimeout(() => setShowCategorySuggestions(false), 200)}
               className="w-full px-3 py-2 bg-gray-700 text-white rounded"
               placeholder="Category name"
             />
+            {showCategorySuggestions && categorySuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-gray-700 border border-gray-600 rounded max-h-40 overflow-y-auto z-10">
+                {categorySuggestions.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setSearchCategory(cat);
+                      setShowCategorySuggestions(false);
+                      const matchedProduct = filteredProducts.find(
+                        (p) => categories.find((c) => c.id === p.categoryId)?.name === cat
+                      );
+                      if (matchedProduct) setSelectedProductIdToAdd(matchedProduct.id);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-gray-600 text-gray-200"
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-          <div>
-            <label className="block text-gray-400 mb-1">
-              Search by Supplier
-            </label>
+          <div className="relative">
+            <label className="block text-gray-400 mb-1">Search by Supplier</label>
             <input
               type="text"
               value={searchSupplier}
-              onChange={(e) => setSearchSupplier(e.target.value)}
+              onChange={(e) => {
+                setSearchSupplier(e.target.value);
+                setShowSupplierSuggestions(true);
+              }}
+              onFocus={() => setShowSupplierSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSupplierSuggestions(false), 200)}
               className="w-full px-3 py-2 bg-gray-700 text-white rounded"
               placeholder="Supplier name"
             />
+            {showSupplierSuggestions && supplierSuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-gray-700 border border-gray-600 rounded max-h-40 overflow-y-auto z-10">
+                {supplierSuggestions.map((supplier) => (
+                  <button
+                    key={supplier}
+                    onClick={() => {
+                      setSearchSupplier(supplier);
+                      setShowSupplierSuggestions(false);
+                      const matchedProduct = filteredProducts.find((p) => p.supplier === supplier);
+                      if (matchedProduct) setSelectedProductIdToAdd(matchedProduct.id);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-gray-600 text-gray-200"
+                  >
+                    {supplier}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
+        <div className="space-y-4">
+          <div className="bg-gray-700 p-4 rounded">
             <h3 className="text-lg font-semibold text-amber-500 mb-2">
               Available Products
             </h3>
-            <div className="max-h-64 overflow-y-auto">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="flex justify-between items-center mb-2 p-2 bg-gray-700 rounded"
-                >
-                  <div>
-                    <span className="block font-semibold">{product.name}</span>
-                    <span className="text-sm text-gray-400">
-                      SKU: {product.sku} | GST: {product.gstPercentage}% | INR{' '}
-                      {product.unitPrice}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => addProduct(product)}
-                    className="bg-amber-500 text-black px-2 py-1 rounded hover:bg-amber-600"
-                  >
-                    Add
-                  </button>
-                </div>
-              ))}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+              <select
+                value={selectedProductIdToAdd}
+                onChange={(e) => setSelectedProductIdToAdd(e.target.value)}
+                className="w-full sm:flex-1 px-3 py-2 bg-gray-800 text-white rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+                <option value="">Select product</option>
+                {filteredProducts.map((product) => (
+                  <option key={product.id} value={product.id}>
+                    {product.name} (INR {product.unitPrice.toFixed(2)})
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={() => {
+                  if (!selectedProductIdToAdd) return;
+                  const product = filteredProducts.find(
+                    (p) => p.id === selectedProductIdToAdd
+                  );
+                  if (product) addProduct(product);
+                }}
+                disabled={!selectedProductIdToAdd}
+                className="w-full sm:w-auto px-3 py-2 bg-amber-500 hover:bg-amber-600 text-black rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Add Product
+              </button>
             </div>
           </div>
-          <div>
+          <div className="bg-gray-700 p-4 rounded">
             <h3 className="text-lg font-semibold text-amber-500 mb-2">
               Selected Items
             </h3>
-            <div className="max-h-64 overflow-y-auto">
+            <div className="space-y-3">
               {selectedItems.map((item) => (
                 <div
                   key={item.product.id}
-                  className="flex justify-between items-center mb-2"
+                  className="w-full bg-gray-800 p-3 rounded-lg"
                 >
-                  <span>{item.product.name}</span>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={item.quantity === 0 ? '' : item.quantity}
-                    onChange={(e) => {
-                      updateQuantity(item.product.id, e.target.value);
-                    }}
-                    className="w-16 px-2 py-1 bg-gray-700 text-white rounded"
-                  />
-                  <span>
-                    INR {(item.product.unitPrice * item.quantity).toFixed(2)}
-                  </span>
-                  <button
-                    onClick={() => removeItem(item.product.id)}
-                    className="text-red-400 hover:text-red-300"
-                  >
-                    Remove
-                  </button>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <p className="font-semibold text-white">{item.product.name}</p>
+                      <p className="text-sm text-gray-400">
+                        SKU: {item.product.sku} | GST: {item.product.gstPercentage}%
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={item.quantity === 0 ? '' : item.quantity}
+                        onChange={(e) => updateQuantity(item.product.id, e.target.value)}
+                        className="w-20 px-2 py-1 bg-gray-700 text-white rounded"
+                      />
+                      <span className="text-white">
+                        INR {(item.product.unitPrice * item.quantity).toFixed(2)}
+                      </span>
+                      <button
+                        onClick={() => removeItem(item.product.id)}
+                        className="text-red-400 hover:text-red-300"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="mt-4">
+            <div className="mt-4 text-sm text-gray-200">
               <p>Subtotal: INR {subtotal.toFixed(2)}</p>
               <p>GST: INR {totalGST.toFixed(2)}</p>
-              <p className="font-bold">
-                Grand Total: INR {grandTotal.toFixed(2)}
-              </p>
+              <p className="font-bold">Grand Total: INR {grandTotal.toFixed(2)}</p>
             </div>
           </div>
         </div>
