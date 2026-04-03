@@ -48,11 +48,11 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
     }
   };
 
-  const updateQuantity = (productId: string, quantity: number) => {
+  const updateQuantity = (productId: string, quantity: number | string) => {
     setSelectedItems(
       selectedItems.map((item) =>
         item.product.id === productId
-          ? { ...item, quantity: Math.max(1, quantity) }
+          ? { ...item, quantity: quantity === '' ? 0 : Math.max(0, Number(quantity)) }
           : item
       )
     );
@@ -241,12 +241,12 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
                 >
                   <span>{item.product.name}</span>
                   <input
-                    type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) =>
-                      updateQuantity(item.product.id, Number(e.target.value))
-                    }
+                    type="text"
+                    inputMode="numeric"
+                    value={item.quantity === 0 ? '' : item.quantity}
+                    onChange={(e) => {
+                      updateQuantity(item.product.id, e.target.value);
+                    }}
                     className="w-16 px-2 py-1 bg-gray-700 text-white rounded"
                   />
                   <span>
@@ -270,16 +270,16 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex justify-end space-x-2 mt-6">
+        <div className="flex flex-col sm:flex-row justify-end gap-2 mt-6">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
+            className="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
           >
             Cancel
           </button>
           <button
             onClick={generatePDF}
-            className="px-4 py-2 bg-amber-500 text-black rounded hover:bg-amber-600"
+            className="w-full sm:w-auto px-4 py-2 bg-amber-500 text-black rounded hover:bg-amber-600"
           >
             Generate PDF
           </button>

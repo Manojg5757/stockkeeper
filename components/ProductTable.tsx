@@ -330,8 +330,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
               {filteredProducts.map((product) => (
                 <tr
                   key={product.id}
-                  onClick={() => onSelectProduct(product)}
-                  className={`cursor-pointer hover:bg-gray-700 transition-colors ${
+                  className={`hover:bg-gray-700 transition-colors ${
                     selectedProductId === product.id ? 'bg-gray-600' : ''
                   }`}
                 >
