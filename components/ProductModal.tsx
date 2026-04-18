@@ -34,6 +34,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
   const [material, setMaterial] = useState('');
   const [grade, setGrade] = useState('');
   const [gstPercentage, setGstPercentage] = useState('18');
+  const [imageUrl, setImageUrl] = useState('');
 
   const generateSkuFromName = (value: string) => {
     const clean = value
@@ -64,6 +65,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
       setMaterial(product.material);
       setGrade(product.grade);
       setGstPercentage(String(product.gstPercentage));
+      setImageUrl(product.imageUrl || '');
     } else {
       setName('');
       setSku('');
@@ -78,6 +80,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
       setMaterial('');
       setGrade('');
       setGstPercentage('18');
+      setImageUrl('');
     }
   }, [product, isOpen]);
 
@@ -138,6 +141,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
       material,
       grade,
       gstPercentage: isNaN(parsedGst) ? 0 : parsedGst,
+      imageUrl: imageUrl.trim() || undefined,
     });
     onClose();
   };
@@ -210,6 +214,16 @@ const ProductModal: React.FC<ProductModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full px-3 py-2 bg-gray-700 text-white rounded"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-400 mb-1">Image URL</label>
+            <input
+              type="url"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-amber-500 focus:outline-none"
+              placeholder="https://example.com/image.jpg"
             />
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
